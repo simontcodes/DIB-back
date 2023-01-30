@@ -26,7 +26,7 @@ const DibsSchema = new Schema({
       "UX/UI",
       "DevOps",
     ],
-    default: "user",
+    default: "Fullstack Developer",
   },
 });
 
