@@ -10,8 +10,6 @@ const Admin = require("../models/Admin");
 router.post("/", async (req, res) => {
   try {
     const admin = new Admin(req.body);
-    const salt = await bcrypt.genSalt(10);
-    admin.password = await bcrypt.hash(admin.password, salt);
     await admin.save();
     res.status(201).send(admin);
   } catch (error) {

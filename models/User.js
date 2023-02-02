@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
-const AdminSchema = new Schema({
+const UserSchema = new Schema({
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -33,13 +33,20 @@ const AdminSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["Super Admin", "Regular Admin"],
-    default: "Super Admin",
+    enum: [
+      "Fullstack Developer",
+      "Frontend Developer",
+      "Backend Developer",
+      "Project Manager",
+      "QA Tester",
+      "UX/UI",
+      "DevOps",
+    ],
   },
 });
 
-// Hash password before saving the admin
-AdminSchema.pre("save", async function (next) {
+// Hash password before saving the user
+UserSchema.pre("save", async function (next) {
   console.log("yes it goes in here");
   if (!this.isModified("password")) {
     return next();
@@ -55,4 +62,4 @@ AdminSchema.pre("save", async function (next) {
   }
 });
 
-module.exports = Admin = mongoose.model("Admin", AdminSchema);
+module.exports = User = mongoose.model("users", UserSchema);

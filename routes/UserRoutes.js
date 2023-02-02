@@ -1,17 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 //Mongoose Model
-const User = require("../models/Dib");
+const User = require("../models/User");
 
-// Create a user
+// POST Route to create a new user
 router.post("/", async (req, res) => {
   try {
-    const user = new User(req.body);
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
+    const user = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+    });
     await user.save();
     res.status(201).send(user);
   } catch (error) {
