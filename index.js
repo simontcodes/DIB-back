@@ -9,7 +9,7 @@ const app = express();
 //Declaring Routes
 const ProjectRoutes = require("./routes/ProjectRoutes.js");
 const AdminRoutes = require("./routes/AdminRoutes.js");
-const DibsRoutes = require("./routes/UserRoutes.js");
+const UserRoutes = require("./routes/UserRoutes.js");
 
 // Connect to MongoDB
 mongoose.connect(process.env.DB_CONNECTOR, { useNewUrlParser: true });
@@ -30,7 +30,7 @@ app.use(cors());
 // Routes
 app.use("/projects", ProjectRoutes);
 app.use("/admins", AdminRoutes);
-app.use("/dibs", DibsRoutes);
+app.use("/dibs", UserRoutes);
 
 // Start server
 const PORT = process.env.PORT || 8080;

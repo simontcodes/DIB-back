@@ -4,30 +4,31 @@ const Schema = mongoose.Schema;
 const projectSchema = new Schema({
   company: {
     type: String,
-    required: true,
+    required: [true, "Company name is required"],
   },
   contactInfo: {
     type: String,
-    required: true,
+    required: [true, "Contact information is required"],
   },
   createdAt: {
     type: Date,
+    required: true,
     default: Date.now,
   },
   assignedTeam: {
-    type: String,
-    required: true,
+    type: mongoose.Types.ObjectId,
+    ref: "Team",
   },
   dateAssignedTeam: {
     type: Date,
-    required: true,
   },
   logo: {
     type: String,
-    required: true,
   },
   status: {
     type: String,
+    enum: ["Pending", "Active", "Completed", "Waiting on team"],
+    default: "Pending",
     required: true,
   },
   rolesNeeded: [String],
