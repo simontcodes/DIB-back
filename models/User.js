@@ -1,7 +1,9 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new Schema({
   name: {
@@ -62,4 +64,64 @@ UserSchema.pre("save", async function (next) {
   }
 });
 
+//use by the get by id route
+UserSchema.statics.findById = function (id, callback) {
+  return this.findOne({ _id: id }, callback);
+};
+
+//used for the login route
+UserSchema.statics.login = function (email, password, callback) {
+  this.findOne({ email: email }, (err, user) => {
+    if (err) {
+      return callback(err);
+    }
+
+    if (!user) {
+      return callback(null, null, { message: "Incorrect email or password" });
+    }
+
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) {
+        return callback(err);
+      }
+
+      if (!result) {
+        return callback(null, null, { message: "Incorrect email or password" });
+      }
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+      callback(null, token);
+    });
+  });
+};
+
+//method to recover a password
+//need to write routes that use this method
+UserSchema.methods.recoverPassword = function (callback) {
+  const user = this;
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  user.save((err) => {
+    if (err) {
+      return callback(err);
+    }
+    sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: user.email,
+      from: "noreply@example.com",
+      subject: "Password Recovery",
+      text: `Use the following token to reset your password: ${resetToken}`,
+      html: `<p>Use the following token to reset your password: ${resetToken}</p>`,
+    };
+    sendgrid.send(msg, (err) => {
+      if (err) {
+        return callback(err);
+      }
+      return callback(null);
+    });
+  });
+};
 module.exports = User = mongoose.model("users", UserSchema);

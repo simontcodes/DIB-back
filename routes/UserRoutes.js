@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 //Mongoose Model
 const User = require("../models/User");
@@ -22,19 +23,18 @@ router.post("/", async (req, res) => {
 
 // Login a user
 router.post("/login", async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(400).send({ error: "Invalid email or password" });
+  //User.login is a method of the User model
+  User.login(req.body.email, req.body.password, (err, token, message) => {
+    if (err) {
+      return res.status(500).send(err);
     }
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
-    if (!isMatch) {
-      return res.status(400).send({ error: "Invalid email or password" });
+
+    if (!token) {
+      return res.status(401).send(message);
     }
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+
+    res.send({ token: token });
+  });
 });
 
 // Update password for a user
@@ -111,15 +111,18 @@ router.get("/", async (req, res) => {
 
 // Get a specific user
 router.get("/:id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).send();
+  //findById is a method defined in the User model
+  User.findById(req.params.id, (err, user) => {
+    if (err) {
+      return res.status(500).send(err);
     }
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
     res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+  });
 });
 
 // Update a specific user
@@ -149,5 +152,33 @@ router.delete("/:id", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+//routes to use with the reset token method
+// router.get('/users/reset/:token', (req, res) => {
+//   User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, (err, user) => {
+//     if (err) { return res.status(500).send(err); }
+//     if (!user) { return res.status(401).send('Password reset token is invalid or has expired'); }
+//     res.render('reset', { token: req.params.token });
+//   });
+// });
+
+// router.post('/users/reset/:token', (req, res) => {
+//   User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, (err, user) => {
+//     if (err) { return res.status(500).send(err); }
+//     if (!user) { return res.status(401).send('Password reset token is invalid or has expired'); }
+//     bcrypt.hash(req.body.password, 10, (err, hash) => {
+//       if (err) { return res.status(500).send(err); }
+//       user.password = hash;
+//       user.resetPasswordToken = undefined;
+//       user.resetPasswordExpires = undefined;
+//       user.save((err) => {
+//         if (err) { return res.status(500).send(err); }
+//         res.send('Password has been reset');
+//       });
+//     });
+//   });
+// });
+
+module.exports = router;
 
 module.exports = router;
