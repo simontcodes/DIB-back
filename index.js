@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 
+//authentication function
+const authenticateJWT = require("./auth");
+
 const app = express();
 
 //Declaring Routes
@@ -28,9 +31,9 @@ app.use(morgan("tiny"));
 app.use(cors());
 
 // Routes
-app.use("/projects", ProjectRoutes);
+app.use("/projects", authenticateJWT, ProjectRoutes);
+app.use("/dibs", authenticateJWT, UserRoutes);
 app.use("/admins", AdminRoutes);
-app.use("/dibs", UserRoutes);
 
 // Start server
 const PORT = process.env.PORT || 8080;
