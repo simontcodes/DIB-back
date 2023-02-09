@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const AdminSchema = new Schema({
   name: {
@@ -54,5 +55,33 @@ AdminSchema.pre("save", async function (next) {
     return next(error);
   }
 });
+
+//user for the login route
+AdminSchema.statics.login = function (email, password, callback) {
+  this.findOne({ email: email }, (err, admin) => {
+    if (err) {
+      return callback(err);
+    }
+
+    if (!admin) {
+      return callback(null, null, { message: "Incorrect email or password" });
+    }
+
+    bcrypt.compare(password, admin.password, (err, result) => {
+      if (err) {
+        return callback(err);
+      }
+
+      if (!result) {
+        return callback(null, null, { message: "Incorrect email or password" });
+      }
+
+      const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+      callback(null, token);
+    });
+  });
+};
 
 module.exports = Admin = mongoose.model("Admin", AdminSchema);

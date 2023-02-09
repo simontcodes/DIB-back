@@ -6,35 +6,18 @@ const jwt = require("jsonwebtoken");
 //Mongoose Model
 const User = require("../models/User");
 
+//Auth use for all the necessary routes
+const authenticateJWT = require("../auth");
+
 // POST Route to create a new user
 router.post("/", async (req, res) => {
   try {
-    const user = new User({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-    });
+    const user = new User(req.body);
     await user.save();
     res.status(201).send(user);
   } catch (error) {
     res.status(400).send(error);
   }
-});
-
-// Login a user
-router.post("/login", async (req, res) => {
-  //User.login is a method of the User model
-  User.login(req.body.email, req.body.password, (err, token, message) => {
-    if (err) {
-      return res.status(500).send(err);
-    }
-
-    if (!token) {
-      return res.status(401).send(message);
-    }
-
-    res.send({ token: token });
-  });
 });
 
 // Update password for a user
@@ -100,7 +83,7 @@ router.post("/recoverpassword", async (req, res) => {
 });
 
 // Get all users
-router.get("/", async (req, res) => {
+router.get("/", authenticateJWT, async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
@@ -110,7 +93,7 @@ router.get("/", async (req, res) => {
 });
 
 // Get a specific user
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticateJWT, async (req, res) => {
   //findById is a method defined in the User model
   User.findById(req.params.id, (err, user) => {
     if (err) {
@@ -126,7 +109,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update a specific user
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", authenticateJWT, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -141,7 +124,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 // Delete a specific user
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateJWT, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
@@ -178,7 +161,5 @@ router.delete("/:id", async (req, res) => {
 //     });
 //   });
 // });
-
-module.exports = router;
 
 module.exports = router;

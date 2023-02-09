@@ -13,6 +13,7 @@ const app = express();
 const ProjectRoutes = require("./routes/ProjectRoutes.js");
 const AdminRoutes = require("./routes/AdminRoutes.js");
 const UserRoutes = require("./routes/UserRoutes.js");
+const LogInRoutes = require("./routes/LogInRoutes.js");
 
 // Connect to MongoDB
 mongoose.connect(process.env.DB_CONNECTOR, { useNewUrlParser: true });
@@ -32,8 +33,11 @@ app.use(cors());
 
 // Routes
 app.use("/projects", authenticateJWT, ProjectRoutes);
-app.use("/dibs", authenticateJWT, UserRoutes);
-app.use("/admins", AdminRoutes);
+//Auth for dibs routes is done inside
+app.use("/dibs", UserRoutes);
+app.use("/admins", authenticateJWT, AdminRoutes);
+//Login routes only includes log in routes for admin and dibs
+app.use("/login", LogInRoutes);
 
 // Start server
 const PORT = process.env.PORT || 8080;
