@@ -17,23 +17,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Login an admin
-router.post("/login", async (req, res) => {
-  try {
-    const admin = await Admin.findOne({ email: req.body.email });
-    if (!admin) {
-      return res.status(400).send({ error: "Invalid email or password" });
-    }
-    const isMatch = await bcrypt.compare(req.body.password, admin.password);
-    if (!isMatch) {
-      return res.status(400).send({ error: "Invalid email or password" });
-    }
-    res.send(admin);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
 // Update password for an admin
 router.patch("/updatepassword", async (req, res) => {
   try {
