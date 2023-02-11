@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 const UserSchema = new Schema({
   name: {
@@ -98,30 +99,50 @@ UserSchema.statics.login = function (email, password, callback) {
 };
 
 //method to recover a password
-//need to write routes that use this method
-UserSchema.methods.recoverPassword = function (callback) {
-  const user = this;
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  user.resetPasswordToken = resetToken;
-  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-  user.save((err) => {
-    if (err) {
-      return callback(err);
+
+UserSchema.methods.sendPasswordResetEmail = function () {
+  const resetPasswordToken = jwt.sign(
+    { _id: this._id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1h",
     }
-    sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
-    const msg = {
-      to: user.email,
-      from: "noreply@example.com",
-      subject: "Password Recovery",
-      text: `Use the following token to reset your password: ${resetToken}`,
-      html: `<p>Use the following token to reset your password: ${resetToken}</p>`,
-    };
-    sendgrid.send(msg, (err) => {
-      if (err) {
-        return callback(err);
-      }
-      return callback(null);
-    });
+  );
+
+  const resetPasswordLink = `http://localhost:3000/reset-password/${resetPasswordToken}`;
+
+  const transporter = nodemailer.createTransport({
+    service: "Hotmail",
+    auth: {
+      user: "digitalimpactbuilders@hotmail.com",
+      pass: process.env.HOTMAIL_PASSWORD,
+    },
   });
+
+  const mailOptions = {
+    from: "digitalimpactbuilders@hotmail.com",
+    to: this.email,
+    subject: "Password Reset",
+    html: `<body>
+    <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Password Recovery</h1>
+    <p style="font-size: 16px; margin-bottom: 20px;">Hi there,</p>
+    <p style="font-size: 16px; margin-bottom: 20px;">We received a request to reset the password for your account. If you did not initiate this request, please disregard this email.</p>
+    <p style="font-size: 16px; margin-bottom: 20px;">To reset your password, please click the button below:</p>
+    <table style="margin: auto;">
+      <tr>
+        <td style="background-color: #5c5c5c; padding: 15px 30px; border-radius: 4px;">
+          <a href="${resetPasswordLink}" style="color: #ffffff; font-size: 16px; text-decoration: none;">Reset Password</a>
+        </td>
+      </tr>
+    </table>
+    <p style="font-size: 16px; margin-top: 20px;">This link will be valid for 1 Hour.</p>
+    <p style="font-size: 16px; margin-top: 20px;">If you continue to have trouble, please reach out to us at digitalimpactbuilders@hotmail.com.</p>
+    <p style="font-size: 16px; margin-top: 20px;">Best regards,</p>
+    <p style="font-size: 16px; margin-top: 20px;">The Team at Digital Impact Builders</p>
+  </body>`,
+  };
+
+  return transporter.sendMail(mailOptions);
 };
+
 module.exports = User = mongoose.model("users", UserSchema);

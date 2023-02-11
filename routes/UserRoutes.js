@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 });
 
 // Update password for a user
-router.patch("/updatepassword", async (req, res) => {
+router.patch("/update-password", async (req, res) => {
   try {
     const user = await User.findById(req.body.id);
     if (!user) {
@@ -49,36 +49,17 @@ router.patch("/updatepassword", async (req, res) => {
 });
 
 // Recover password for a user
-router.post("/recoverpassword", async (req, res) => {
+
+router.post("/forgot-password", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(400).send({ error: "No user found with that email" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Generate a recovery token
-    const recoveryToken = jwt.sign(
-      { id: user._id },
-      process.env.RECOVERY_SECRET,
-      { expiresIn: "1h" }
-    );
-    user.recoveryToken = recoveryToken;
-    user.recoveryTokenExp = Date.now() + 3600000; // 1 hour
-    await user.save();
+    await user.sendPasswordResetEmail();
 
-    // Send recovery email using SendGrid
-    const msg = {
-      to: req.body.email,
-      from: process.env.FROM_EMAIL,
-      subject: "Password recovery",
-      html: `<p>You requested a password recovery</p>
-                   <p>Click this <a href="${process.env.CLIENT_URL}/resetpassword/${recoveryToken}">link</a> to reset your password</p>`,
-    };
-    await sgMail.send(msg);
-
-    res.send({ message: "Recovery email sent" });
+    return res.status(200).json({ message: "Password reset email sent" });
   } catch (error) {
-    res.status(500).send(error);
+    return res.status(500).json({ message: error.message });
   }
 });
 
