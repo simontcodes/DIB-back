@@ -79,7 +79,9 @@ AdminSchema.statics.login = function (email, password, callback) {
       const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
-      callback(null, token);
+
+      console.log(admin)
+      callback(null, token, admin);
     });
   });
 };
