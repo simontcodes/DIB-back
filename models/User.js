@@ -88,11 +88,13 @@ UserSchema.statics.login = function (email, password, callback) {
       if (!result) {
         return callback(null, null, { message: "Incorrect email or password" });
       }
-
+      
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
-      callback(null, token);
+    
+      console.log(user)
+      callback(null, token, user);
     });
   });
 };

@@ -94,6 +94,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
 // Get a specific user
 router.get("/:id", authenticateJWT, async (req, res) => {
+// router.get("/:id", async (req, res) => {
   //findById is a method defined in the User model
   User.findById(req.params.id, (err, user) => {
     if (err) {
