@@ -35,8 +35,7 @@ app.use(cors());
 app.use("/projects", authenticateJWT, ProjectRoutes);
 //Auth for dibs routes is done inside
 app.use("/dibs", UserRoutes);
-// app.use("/admins", authenticateJWT, AdminRoutes);
-app.use("/admins", AdminRoutes);
+app.use("/admins", authenticateJWT, AdminRoutes);
 //Login routes only includes log in routes for admin and dibs
 app.use("/login", LogInRoutes);
 
