@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 
 //Mongoose Model
 const User = require("../models/User");
@@ -75,6 +75,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
 // Get a specific user
 router.get("/:id", authenticateJWT, async (req, res) => {
+// router.get("/:id", async (req, res) => {
   //findById is a method defined in the User model
   User.findById(req.params.id, (err, user) => {
     if (err) {
