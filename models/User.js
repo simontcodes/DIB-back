@@ -35,7 +35,7 @@ const UserSchema = new Schema({
     },
   },
   role: {
-    type: String,
+    type: [String],
     enum: [
       "Fullstack Developer",
       "Frontend Developer",
@@ -89,12 +89,12 @@ UserSchema.statics.login = function (email, password, callback) {
       if (!result) {
         return callback(null, null, { message: "Incorrect email or password" });
       }
-      
+
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
-    
-      console.log(user)
+
+      console.log(user);
       callback(null, token, user);
     });
   });
