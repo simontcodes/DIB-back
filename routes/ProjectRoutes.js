@@ -19,7 +19,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       company: req.body.company,
       contactInfo: req.body.contactInfo,
       assignedTeam: team._id,
-      rolesNeeded: req.body.roles,
+      rolesNeeded: JSON.parse(req.body.roles),
       logo: req.file.path, // set the image path as a string in the project document
     });
     await project.save();
