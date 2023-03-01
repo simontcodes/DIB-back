@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 
 //Auth use for all the necessary routes
-const authenticateJWT = require("../auth");
+const authenticateJWT = require("../middleware/auth");
 
 // POST Route to create a new user
 router.post("/", async (req, res) => {
@@ -75,7 +75,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
 // Get a specific user
 router.get("/:id", authenticateJWT, async (req, res) => {
-// router.get("/:id", async (req, res) => {
+  // router.get("/:id", async (req, res) => {
   //findById is a method defined in the User model
   User.findById(req.params.id, (err, user) => {
     if (err) {

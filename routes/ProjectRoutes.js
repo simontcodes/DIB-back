@@ -1,15 +1,29 @@
 const express = require("express");
 const router = express.Router();
+//multer as middleware
+const upload = require("../middleware/upload");
 
-//Mongoose Model
+//Mongoose Models
 const Project = require("../models/Project");
+const Team = require("../models/Team");
 
 // Create a project
-router.post("/", async (req, res) => {
+router.post("/", upload.single("image"), async (req, res) => {
   try {
-    const project = new Project(req.body);
+    const team = new Team({
+      name: req.body.teamName,
+    });
+    await team.save();
+
+    const project = new Project({
+      company: req.body.company,
+      contactInfo: req.body.contactInfo,
+      assignedTeam: team._id,
+      rolesNeeded: req.body.roles,
+      logo: req.file.path, // set the image path as a string in the project document
+    });
     await project.save();
-    res.status(201).send(project);
+    res.status(201).send(project, team);
   } catch (error) {
     res.status(400).send(error);
   }

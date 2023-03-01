@@ -19,11 +19,8 @@ const projectSchema = new Schema({
     type: mongoose.Types.ObjectId,
     ref: "Team",
   },
-  dateAssignedTeam: {
-    type: Date,
-  },
   logo: {
-    type: String,
+    path: String,
   },
   status: {
     type: String,
@@ -31,7 +28,12 @@ const projectSchema = new Schema({
     default: "Pending",
     required: true,
   },
-  rolesNeeded: [String],
+  rolesNeeded: [
+    {
+      role: String,
+      quantity: Number,
+    },
+  ],
   repos: [String],
   finishedAt: {
     type: Date,
