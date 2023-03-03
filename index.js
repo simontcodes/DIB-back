@@ -15,6 +15,7 @@ const AdminRoutes = require("./routes/AdminRoutes.js");
 const TeamsRoutes = require("./routes/TeamsRoutes.js");
 const UserRoutes = require("./routes/UserRoutes.js");
 const LogInRoutes = require("./routes/LogInRoutes.js");
+const InquiryRoutes = require("./routes/InquiryRoutes.js");
 
 // Connect to MongoDB
 mongoose.connect(process.env.DB_CONNECTOR, { useNewUrlParser: true });
@@ -40,9 +41,10 @@ app.use("/admins", authenticateJWT, AdminRoutes);
 app.use("/teams", TeamsRoutes);
 //Login routes only includes log in routes for admin and dibs
 app.use("/login", LogInRoutes);
+app.use("/inquiry", InquiryRoutes);
 
 // This middleware allows us to serve static filess
-app.use('/uploads', express.static('./uploads'));
+app.use("/uploads", express.static("./uploads"));
 
 // Start server
 const PORT = process.env.PORT || 8080;
