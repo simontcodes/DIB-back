@@ -12,6 +12,7 @@ const app = express();
 //Declaring Routes
 const ProjectRoutes = require("./routes/ProjectRoutes.js");
 const AdminRoutes = require("./routes/AdminRoutes.js");
+const TeamsRoutes = require("./routes/TeamsRoutes.js");
 const UserRoutes = require("./routes/UserRoutes.js");
 const LogInRoutes = require("./routes/LogInRoutes.js");
 const InquiryRoutes = require("./routes/InquiryRoutes.js");
@@ -37,6 +38,7 @@ app.use("/projects", authenticateJWT, ProjectRoutes);
 //Auth for dibs routes is done inside
 app.use("/dibs", UserRoutes);
 app.use("/admins", authenticateJWT, AdminRoutes);
+app.use("/teams", TeamsRoutes);
 //Login routes only includes log in routes for admin and dibs
 app.use("/login", LogInRoutes);
 app.use("/inquiry", InquiryRoutes);
