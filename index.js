@@ -39,6 +39,9 @@ app.use("/admins", authenticateJWT, AdminRoutes);
 //Login routes only includes log in routes for admin and dibs
 app.use("/login", LogInRoutes);
 
+// This middleware allows us to serve static filess
+app.use('/uploads', express.static('./uploads'));
+
 // Start server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

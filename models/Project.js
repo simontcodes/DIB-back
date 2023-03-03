@@ -20,7 +20,7 @@ const projectSchema = new Schema({
     ref: "Team",
   },
   logo: {
-    path: String,
+    type: String,
   },
   status: {
     type: String,
