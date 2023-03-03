@@ -18,8 +18,25 @@ const teamSchema = new mongoose.Schema({
       },
     },
   ],
-});
+}, {_id: false});
+
+teamSchema.methods.addTeammate = async function (teammate) {
+  this.teammates.push(teammate)
+  await this.save()
+};
+
+teamSchema.methods.deleteTeammate = async function (teammateId) {
+  const teammateIndex = this.teammates.findIndex(
+    (teammate) => teammate.user.toString() === teammateId.toString()
+  );
+  
+  if (teammateIndex !== -1) {
+    this.teammates.splice(teammateIndex, 1);
+    await this.save();
+  } else {
+    return ({ message: "Team member not found" });
+  }
+};
 
 const Team = mongoose.model("Team", teamSchema);
-
 module.exports = Team;
