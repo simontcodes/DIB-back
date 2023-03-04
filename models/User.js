@@ -46,6 +46,10 @@ const UserSchema = new Schema({
       "DevOps",
     ],
   },
+  team: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Team",
+  },
 });
 
 // Hash password before saving the user
