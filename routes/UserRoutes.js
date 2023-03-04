@@ -66,7 +66,7 @@ router.post("/forgot-password", async (req, res) => {
 // Get all users
 router.get("/", authenticateJWT, async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({}, "-password");
     res.send(users);
   } catch (error) {
     res.status(500).send(error);
@@ -75,7 +75,6 @@ router.get("/", authenticateJWT, async (req, res) => {
 
 // Get a specific user
 router.get("/:id", authenticateJWT, async (req, res) => {
-  // router.get("/:id", async (req, res) => {
   //findById is a method defined in the User model
   User.findById(req.params.id, (err, user) => {
     if (err) {
